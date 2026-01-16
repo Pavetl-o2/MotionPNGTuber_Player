@@ -135,6 +135,8 @@ button:disabled {
     transform: translateZ(0);
     will-change: transform;
     backface-visibility: hidden;
+    /* Subtle blur to smooth out clipping edges - similar to Edge's "Enhance" */
+    filter: blur(0.4px);
 }
 
 .controls {
