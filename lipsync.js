@@ -257,6 +257,7 @@ class LipsyncEngine {
         if (this.mouthCtx) {
             this.mouthCtx.setTransform(1, 0, 0, 1, 0, 0);
             this.mouthCtx.imageSmoothingEnabled = true;
+            this.mouthCtx.imageSmoothingQuality = 'high';
             this.mouthCtx.clearRect(0, 0, this.mouthCanvas.width, this.mouthCanvas.height);
         }
     }
@@ -722,10 +723,27 @@ class LipsyncEngine {
         const ctx = this.mouthCtx;
         ctx.save();
         ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+        // Expand triangle slightly to eliminate seam/outline artifacts
+        const expand = 0.8; // pixels to expand
+        const cx = (d0[0] + d1[0] + d2[0]) / 3;
+        const cy = (d0[1] + d1[1] + d2[1]) / 3;
+
+        const expandPoint = (p) => {
+            const dx = p[0] - cx;
+            const dy = p[1] - cy;
+            const len = Math.sqrt(dx * dx + dy * dy) || 1;
+            return [p[0] + (dx / len) * expand, p[1] + (dy / len) * expand];
+        };
+
+        const e0 = expandPoint(d0);
+        const e1 = expandPoint(d1);
+        const e2 = expandPoint(d2);
+
         ctx.beginPath();
-        ctx.moveTo(d0[0], d0[1]);
-        ctx.lineTo(d1[0], d1[1]);
-        ctx.lineTo(d2[0], d2[1]);
+        ctx.moveTo(e0[0], e0[1]);
+        ctx.lineTo(e1[0], e1[1]);
+        ctx.lineTo(e2[0], e2[1]);
         ctx.closePath();
         ctx.clip();
 
